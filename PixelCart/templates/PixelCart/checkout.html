@@ -13,10 +13,10 @@
 <!-- ============================ COMPONENT 1 ================================= -->
 <div class="row">
 	<aside class="col-lg-6">
-<div class="card">
+<div class="card"> 
     <div class="card-body">
         <h4>Billing Address</h4>
-        <form action="" method="POST">
+        <form action="{% url "place_order" %}" method="POST">
             {% csrf_token %}
             <div class="form-row">
                 <div class="col form-group">
@@ -38,8 +38,8 @@
             </div>
                 <div class="form-row">
                     <div class="col form-group">
-                        <label for="phone number">Phone Number</label>
-                        <input type="text" name='phone_number' class="form-control" placeholder="Phone Number" required>
+                        <label for="phone number">Phone</label>
+                        <input type="text" name='phone' class="form-control" placeholder="Phone" required>
                     </div>
                 </div>
                     <div class="form-row">
@@ -70,6 +70,18 @@
                                     <label for=""> Order Note</label>
                                         <textarea name="note" rows="2" cols="30" class="form-control"></textarea>
                             </div>
+                            {% if form.errors %}
+                            <div class="alert alert-danger">
+            <strong>Error!</strong> Please correct the following errors:
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
                                   
 
         
@@ -133,7 +145,7 @@
                 </tbody>
                 </table>
 			
-            <button type"submit" name="submit" class="btn btn-primary btn-block">Place Order </button> 
+            <button type="submit" name="submit" class="btn btn-primary btn-block">Place Order </button> 
 			<a href="{% url "store" %}" class="btn btn-light btn-block">Continue Shopping</a>
 
         </form>
