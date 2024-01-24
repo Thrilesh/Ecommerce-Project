@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from cart.models import CartItem
 from orders.models import Order
 from . forms import OrderForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -13,7 +14,8 @@ def payments(request):
     return render(request, "PixelCart/payments.html")
 
 
-def place_order(request, total=0, quantity=0,):
+@login_required  # Apply login_required decorator to ensure the user is authenticated
+def place_order(request, total=0, quantity=0):
     current_user = request.user
 
     # if the cart count is zero or less than zero, then the user will be redirected to shop/store
