@@ -81,6 +81,10 @@ WSGI_APPLICATION = 'ecommerce_site.wsgi.application'
 AUTH_USER_MODEL = "accounts.Account"
 
 
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 

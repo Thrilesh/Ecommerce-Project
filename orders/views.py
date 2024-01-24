@@ -82,6 +82,5 @@ def place_order(request, total=0, quantity=0):
 
             return render(request, "PixelCart/payments.html", context)
         else:
-            # If form is not valid, handle it here
-            print(form.errors)
+
             return redirect("checkout")
