@@ -46,7 +46,7 @@ def register(request):
                 'token': default_token_generator.make_token(user)
             })
             to_email = email
-            send_email = EmailMessage(mail_subject, message, to=[email])
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
 
             # messages.success(
@@ -114,7 +114,7 @@ def login(request):
             messages.success(request, 'You are now logged in.')
             url = request.META.get('HTTP_REFERER')
             try:
-                query = requests.utils.urlparse(url).query
+                query = request.utils.urlparse(url).query
                 # next=/cart/checkout/
                 params = dict(x.split('=') for x in query.split('&'))
                 if 'next' in params:
@@ -176,7 +176,7 @@ def forgotPassword(request):
                 'token': default_token_generator.make_token(user)
             })
             to_email = email
-            send_email = EmailMessage(mail_subject, message, to=[email])
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
             messages.success(
                 request, "Password email address has been sent to your email address")
