@@ -168,29 +168,30 @@
                 // Successful capture! For demo purposes:
                 console.log('details');
                 sendData();
+                function sendData() {
+                    fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrftoken,
+                        },
+                        body: JSON.stringify({
+                            orderID: orderID,
+                            transID: orderData.id,
+                            payment_method: payment_method,
+                            status: orderData.status,
+                        }),
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        window.location.href = redirect_url + "?order_number=" + data.order_number + "&payment_id=" + data.transaction_id;
+                    });
+                }
             });
         }   
     }).render('#paypal-button-container');
 
-    function sendData() {
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrftoken,
-            },
-            body: JSON.stringify({
-                orderID: orderID,
-                transID: orderData.id,
-                payment_method: payment_method,
-                status: orderDaa.status,
-            }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            window.location.href = redirect_url + "?order_number=" + data.order_number + "&payment_id=" + data.transaction_id;
-        });
-    }
+    
 </script>
 
 

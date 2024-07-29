@@ -1,5 +1,5 @@
 import datetime
-from email.message import EmailMessage
+from django.core.mail import EmailMessage
 import json
 from urllib import request
 from django.forms import model_to_dict
@@ -186,6 +186,7 @@ def order_complete(request):
             "order_number": order.order_number,
             "transId": payment.payment_id,
             'subtotal': subtotal,
+            'payment': payment,
         }
         return render(request, "Pixelcart/order_complete.html", context)
 
