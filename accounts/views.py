@@ -4,14 +4,15 @@ from base64 import urlsafe_b64encode
 from django.core.mail import EmailMessage
 from django.contrib import messages, auth
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
-from accounts.models import Account
+from accounts.models import Account, UserProfile
 from cart.models import Cart, CartItem
 from cart.views import _cart_id
-from .forms import RegistrationForm
+from orders.models import Order, OrderProduct
+from .forms import RegistrationForm, UserForm, UserProfileForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode
@@ -35,6 +36,11 @@ def register(request):
                 first_name=first_name, last_name=last_name, email=email, username=username, password=password)
             user.phone_number = phone_number
             user.save()
+
+            profile = UserProfile()
+            profile.user_id = user.id
+            profile.profile_picture = "default/testimoila-1.png"
+            profile.save()
 
             # user activation
             current_site = get_current_site(request)
@@ -156,7 +162,17 @@ def activate(request, uidb64, token):
 
 @login_required(login_url="login")
 def dashboard(request):
-    return render(request, "PixelCart/dashboard.html")
+    orders = Order.objects.order_by(
+        "-created_at").filter(user=request.user.id, is_ordered=True)
+    order_count = orders.count()
+    userprofile = UserProfile.objects.get(user_id=request.user.id)
+
+    context = {
+        "orders": orders,
+        "order_count": order_count,
+        "userprofile": userprofile,
+    }
+    return render(request, "PixelCart/dashboard.html", context)
 
 
 def forgotPassword(request):
@@ -220,3 +236,83 @@ def resetPassword(request):
             messages.error(request, "Password do not match ")
     else:
         return render(request, "PixelCart/resetPassword.html")
+
+
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.filter(
+        user=request.user.id, is_ordered=True).order_by("-created_at")
+    context = {
+        "orders": orders,
+    }
+    return render(request, "PixelCart/includes/my_orders.html", context)
+
+
+@login_required(login_url='login')
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(
+            request.POST, request.FILES, instance=userprofile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated")
+            return redirect('edit_profile')
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+
+    }
+    return render(request, "PixelCart/includes/edit_profile.html", context)
+
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == "POST":
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+
+        user = Account.objects.get(username__exact=request.user.username)
+
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                # auth.Logout(request) *logout after password changing
+                messages.success(request, "Password changed successfully.")
+                return redirect("change_password")
+            else:
+                messages.error(request, "Current password is incorrect.")
+                return redirect("change_password")
+        else:
+            messages.error(request, "Passwords do not match")
+            return redirect("change_password")
+
+    return render(request, "PixelCart/includes/change_password.html")
+
+
+@login_required(login_url="login")
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    subtotal = 0
+    for item in order_detail:
+        subtotal += item.product.price * item.quantity
+
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'subtotal': subtotal,
+
+    }
+    return render(request, "PixelCart/includes/order_detail.html", context)
