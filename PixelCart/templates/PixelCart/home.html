@@ -30,8 +30,18 @@
 		<div class="card card-product-grid">
 			<a href= "{{ product.get_url }}" class="img-wrap"> <img src="{{product.image.url}}"> </a>
 			<figcaption class="info-wrap">
-				<a href={{  product.get_url }} class="title">{{ product.product_name}}</a>
+				<a href={{product.get_url}} class="title">{{ product.product_name}}</a>
 				<div class="price mt-1"> ${{product.price}}</div> <!-- price-wrap.// -->
+				<div class="rating-star">
+					<span>
+						<i class="fa fa-star{% if product.averageReview >= 0.5 %}-half{% elif product.averageReview < 0.5 %} -o{% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview >= 1.5 %}-half{% elif product.averageReview < 1.5 %} -o{% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview >= 2.5 %}-half{% elif product.averageReview < 2.5 %} -o{% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview >= 3.5 %}-half{% elif product.averageReview < 3.5 %} -o{% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview >= 4.5 %}-half{% elif product.averageReview < 4.5 %} -o{% endif %}" aria-hidden="true"></i>
+					</span>
+				</div>
+				
 			</figcaption>
 	
 		</div>
