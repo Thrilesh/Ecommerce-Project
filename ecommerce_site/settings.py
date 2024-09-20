@@ -28,7 +28,8 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = [
-    'django-greatkart-env.eba-hdbwjrbh.us-west-2.elasticbeanstalk.com']
+    'django-app-env.eba-2dupdrh2.us-west-2.elasticbeanstalk.com', '172.31.7.104'
+]
 
 
 # Application definition

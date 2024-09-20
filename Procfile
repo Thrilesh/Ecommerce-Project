@@ -1,0 +1,1 @@
+web: gunicorn --workers 3 ecommerce_site.wsgi:application
